@@ -1,0 +1,15 @@
+# Python cache
+__pycache__/
+*.py[cod]
+*$py.class
+.pytest_cache/
+
+# Local configuration and secrets
+.env
+
+# Raw, processed, and database data files
+data/
+*.db
+
+# Great Expectations runtime validations and documents
+great_expectations/uncommitted/
