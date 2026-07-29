@@ -3,42 +3,6 @@
 This repository contains a containerized, production-grade batch ETL pipeline orchestrated by **Apache Airflow** and validated at each stage using **Great Expectations (GX)**. The pipeline ingests transactional e-commerce data, processes it into Bronze (raw parquet) and Silver (refined analytical) layers, runs rigorous schema and business validations (acting as circuit breakers), and loads the final aggregated data into a **SQLite** database serving layer.
 
 ---
-
-## Architecture & Data Flow
-
-Below is the visual diagram illustrating the ETL flow, storage layers, and quality control gates.
-
-```mermaid
-graph TD
-    subgraph Raw Layer
-        A[External CSV Data Source] -->|download_raw_data| B[data/raw/raw_data.csv]
-    end
-
-    subgraph Bronze Layer (Schema Check)
-        B -->|bronze_layer_processing| C[data/bronze/ Partitioned Parquet]
-        C -->|validate_bronze| D{Bronze Checkpoint}
-        D -->|Validation Fails| E[Circuit Breaker / Fail Task]
-    end
-
-    subgraph Silver Layer (Business Refinement)
-        D -->|Validation Passes| F[silver_layer_transformation]
-        F -->|Impute CustomerID / Filter / Aggregate| G[data/silver/ Partitioned Parquet]
-        G -->|validate_silver| H{Silver Checkpoint}
-        H -->|Validation Fails| I[Circuit Breaker / Fail Task]
-    end
-
-    subgraph Serving Layer
-        H -->|Validation Passes| J[load_to_analytical_store]
-        J -->|Idempotent Load| K[(data/analytics.db - SQLite)]
-    end
-
-    style E fill:#ff9999,stroke:#330000,stroke-width:2px
-    style I fill:#ff9999,stroke:#330000,stroke-width:2px
-    style K fill:#99ff99,stroke:#003300,stroke-width:2px
-```
-
----
-
 ## Directory Structure
 
 ```directory
